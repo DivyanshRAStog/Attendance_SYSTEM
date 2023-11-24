@@ -9,9 +9,10 @@ const AdminLayout = () => {
     <div>
         <Routes>
             <Route path='/attendence-code' element={<AttendenceCode />} />
-            {/* <Route path='/attendence-history' element={<AttHistory />} />
-            <Route path='/announcements' element={<Announcements />} />
-            <Route path='*' element={<Navigate to="/announcements" />} /> */}
+            {/* <Route path='/attendence-history' element={<AttHistory />} /> */}
+            {/* <Route path='/announcements' element={<Announcements />} /> */}
+            {/* <Route path='*' element={<Navigate to="/announcements" />} />  */}
+            <Route path='*' element={<Navigate to="/attendence-code" />} /> 
         </Routes>
     </div>
   )
