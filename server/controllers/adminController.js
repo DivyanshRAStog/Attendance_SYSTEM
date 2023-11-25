@@ -25,7 +25,7 @@ exports.registerStudent = catchErrors(async (req, res) => {
 }) 
 
 exports.generateAttCode = catchErrors (async (req, res) => {
-    const {subject, validity} = req.body
+    const {subject, validity, batch, branch} = req.body
     let minutes = Number(validity)
     console.log({minutes})
     const code = getCode()
@@ -35,6 +35,9 @@ exports.generateAttCode = catchErrors (async (req, res) => {
         code,
         expiresAt,
         subject,
+        batch,
+        branch,
+        generatedBy : req.user._id,
         validity : minutes
     })
 
@@ -43,25 +46,68 @@ exports.generateAttCode = catchErrors (async (req, res) => {
 })
 
 exports.getAllAttCodes = catchErrors(async (req, res) => {
-    const attCodes = await AttendenceCode.find().sort({createdAt : 'desc'})
+    const attCodes = await AttendenceCode.find({generatedBy: req.user._id}).sort({createdAt : 'desc'})
     res.status(200).json(successResponse('success', attCodes))
 })
 
 exports.getAttndenceHistory = catchErrors(async (req, res) => {
-    const attHistory = await Attendence.find()
-        .populate('attCode')
-        .populate('student')
-        .sort({createdAt : 'desc'})
-    
+    const {dateString, batch, branch} = req.query
+    const query = {}
+    if(dateString) query.dateString = dateString
+    if(batch) query.batch = batch
+    if(branch) query.branch = branch
+
+    // const attHistory = await Attendence.find(query)
+    //     .populate({
+    //         path: 'attCode',
+    //         match: {generatedBy: req.user._id}
+    //     })
+    //     .populate('student')
+    //     .sort({createdAt : 'desc'})
+    const attHistory = await Attendence.aggregate([
+        {
+          $lookup: {
+            from: 'AttendenceCode',
+            localField: 'attCode',
+            foreignField: '_id',
+            as: 'attCode',
+          },
+        },
+        {
+          $match: {
+            'attCode.generatedBy': req.user._id,
+            ...query,
+          },
+        },
+        {
+          $lookup: {
+            from: 'User',
+            localField: 'student',
+            foreignField: '_id',
+            as: 'student',
+          },
+        },
+        {
+          $unwind: '$attCode', // If you know attCode will always be an array of length 1
+        },
+        {
+          $unwind: '$student', // If you know student will always be an array of length 1
+        },
+        {
+          $sort: { createdAt: -1 },
+        },
+      ]);
+          
     res.status(200).json(successResponse('success', attHistory))
 })
 
 exports.makeAnnouncement = catchErrors(async (req, res) => {
-    const {description} = req.body
-    if(!description) return res.status(400).json(errorResponse('description is required'))
+    const { batch, branch, description } = req.body
+    if(!description || !batch || !branch) return res.status(400).json(errorResponse('description is required'))
 
     const announcement  = new Announcement({
-        description
+        announcer: req.user.name,
+        ...req.body,
     })
     const savedAnncmnt = await announcement.save()
     res.status(200).json(successResponse('success', savedAnncmnt))

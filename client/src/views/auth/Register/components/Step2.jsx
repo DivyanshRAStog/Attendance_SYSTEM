@@ -45,7 +45,7 @@ const Step2 = () => {
         let body = step1RegisterDetails
         const uploadedImages = await uploadFiles(images)
         console.log({ uploadedImages })
-        body = { ...body, images: uploadedImages }
+        body = { ...body, images: uploadedImages, role : 'STUDENT' }
 
         const resp = await register(body)
         if (resp?.error === false) {
