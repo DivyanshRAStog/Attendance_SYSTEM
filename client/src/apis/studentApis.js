@@ -38,8 +38,13 @@ export const markAttendence = async (body) => {
     return await fetchApi(route, options)
 }
 
-export const getMyAttendence = async () => {
-    const route = '/api/student/get-my-attendence'
+export const getMyAttendence = async (queryParams) => {
+    const queryString = Object.entries(queryParams)
+        .filter(([key, value]) => value !== undefined && value !== null && value !== '')
+        .map(([key, value]) => `${key}=${value}`)
+        .join('&');
+        
+    const route = `/api/student/get-my-attendence?${queryString}`
     const options = {
         method: "GET",
         headers: { 

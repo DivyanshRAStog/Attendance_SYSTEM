@@ -45,10 +45,44 @@ exports.markAttendence = catchErrors(async (req, res) => {
 })
 
 exports.getMyAttendence = catchErrors(async (req, res) => {
-    const attHistory = await Attendence.find({ student: req.user._id })
-        .populate('attCode')
-        .populate('student')
-        .sort({createdAt : 'desc'})
+    const {dateString, subject} = req.query
+    const query = {}
+    if(dateString) query.dateString = getDateString(dateString)
+    if(subject) query['attCode.subject'] = {$regex : subject, $options : 'i'}
+ 
+    const attHistory = await Attendence.aggregate([
+        {
+          $lookup: {
+            from: 'AttendenceCode',
+            localField: 'attCode',
+            foreignField: '_id',
+            as: 'attCode',
+          },
+        },
+        {
+          $match: {
+            student: req.user._id ,
+            ...query,
+          },
+        },
+        {
+          $lookup: {
+            from: 'User',
+            localField: 'student',
+            foreignField: '_id',
+            as: 'student',
+          },
+        },
+        {
+          $unwind: '$attCode', // attCode will always be an array of length 1 hence unwinding it
+        },
+        {
+          $unwind: '$student', // student will always be an array of length 1 hence unwinding it
+        },
+        {
+          $sort: { createdAt: -1 },
+        },
+      ]);
 
     res.status(200).json(successResponse('success', attHistory))
 })

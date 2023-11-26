@@ -2,7 +2,7 @@ const User = require('../models/User')
 const catchErrors = require('../utils/catchErrors')
 const { successResponse, errorResponse } = require('../utils/response')
 const AttendenceCode = require('../models/AttendenceCode');
-const { getCode } = require('../utils/AttendenceUtils');
+const { getCode, getDateString } = require('../utils/AttendenceUtils');
 const Attendence = require('../models/Attendence');
 const Announcement = require('../models/Announcement');
 
@@ -51,19 +51,13 @@ exports.getAllAttCodes = catchErrors(async (req, res) => {
 })
 
 exports.getAttndenceHistory = catchErrors(async (req, res) => {
-    const {dateString, batch, branch} = req.query
+    const {dateString, batch, branch, subject} = req.query
     const query = {}
-    if(dateString) query.dateString = dateString
-    if(batch) query.batch = batch
-    if(branch) query.branch = branch
-
-    // const attHistory = await Attendence.find(query)
-    //     .populate({
-    //         path: 'attCode',
-    //         match: {generatedBy: req.user._id}
-    //     })
-    //     .populate('student')
-    //     .sort({createdAt : 'desc'})
+    if(dateString) query.dateString = getDateString(dateString)
+    if(batch) query['attCode.batch'] = batch
+    if(branch) query['attCode.branch'] = branch
+    if(subject) query['attCode.subject'] = {$regex : subject, $options : 'i'}
+ 
     const attHistory = await Attendence.aggregate([
         {
           $lookup: {
@@ -88,16 +82,16 @@ exports.getAttndenceHistory = catchErrors(async (req, res) => {
           },
         },
         {
-          $unwind: '$attCode', // If you know attCode will always be an array of length 1
+          $unwind: '$attCode', // attCode will always be an array of length 1 hence unwinding it
         },
         {
-          $unwind: '$student', // If you know student will always be an array of length 1
+          $unwind: '$student', // student will always be an array of length 1 hence unwinding it
         },
         {
           $sort: { createdAt: -1 },
         },
       ]);
-          
+
     res.status(200).json(successResponse('success', attHistory))
 })
 
