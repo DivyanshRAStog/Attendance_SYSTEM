@@ -90,8 +90,3 @@ exports.fetchUser = catchErrors(async (req, res) => {
 
 //     return res.status(200).json(successResponse("success", urls))
 // })
-
-exports.getAnnouncements = catchErrors(async (req, res) => {
-    const announcmnts = await Announcement.find().sort({createdAt : 'desc'})
-    res.status(200).json(successResponse('success', announcmnts))
-})

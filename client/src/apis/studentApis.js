@@ -49,3 +49,14 @@ export const getMyAttendence = async () => {
     return await fetchApi(route, options)
 }
 
+export const getAnnouncements = async () => {
+    const route =  '/api/student/get-announcements'
+    const options = {
+        method: "GET",
+        headers : {
+            authorization : `token ${localStorage.getItem('token')}`
+        }
+    }
+    return await fetchApi(route, options)
+}
+

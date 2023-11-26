@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 
 const announcementSchema = new mongoose.Schema({
     announcer: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
     },
     batch: {
         type: String,

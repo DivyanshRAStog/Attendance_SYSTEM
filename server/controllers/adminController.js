@@ -103,12 +103,22 @@ exports.getAttndenceHistory = catchErrors(async (req, res) => {
 
 exports.makeAnnouncement = catchErrors(async (req, res) => {
     const { batch, branch, description } = req.body
-    if(!description || !batch || !branch) return res.status(400).json(errorResponse('description is required'))
+    if(!description || !batch || !branch) return res.status(400).json(errorResponse('one or more fields are required'))
 
     const announcement  = new Announcement({
-        announcer: req.user.name,
+        announcer: req.user._id,
         ...req.body,
     })
     const savedAnncmnt = await announcement.save()
     res.status(200).json(successResponse('success', savedAnncmnt))
+})
+
+exports.getAnnouncements = catchErrors(async (req, res) => {
+  const announcmnts = await Announcement.find({
+    announcer: req.user._id
+  })
+  .populate('announcer', 'name')
+  .sort({createdAt : 'desc'})
+
+  res.status(200).json(successResponse('success', announcmnts))
 })

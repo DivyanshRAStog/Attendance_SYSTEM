@@ -24,6 +24,8 @@ const Step1 = ({ setStepCount, setActiveStep }) => {
             dispatch(SET_FORM_DETAILS({
                 name,
                 enrollmentNo,
+                batch,
+                branch,
                 password
             }))
             setStepCount(prev => prev + 1)
@@ -47,7 +49,7 @@ const Step1 = ({ setStepCount, setActiveStep }) => {
                             required
                             margin='normal'
                         />
-                          <FormControl sx={{ width: '100%', mt: 2 }}>
+                          <FormControl sx={{ width: '100%', mt: 1, mb: 2 }}>
                             <InputLabel id="batch-label">Batch</InputLabel>
                             <Select
                                 labelId="batch-label"
@@ -63,7 +65,7 @@ const Step1 = ({ setStepCount, setActiveStep }) => {
                             </Select>
                         </FormControl>
       
-                        <FormControl sx={{ width: '100%', mt: 1 }}>
+                        <FormControl sx={{ width: '100%', mb: 0 }}>
                             <InputLabel id="branch-label">Branch</InputLabel>
                             <Select
                                 labelId="branch-label"

@@ -8,12 +8,12 @@ const StudentLayout = () => {
   return (
     <div>
         <Routes>
-            {/* <Route path='/home' element={<Home />} /> */}
+            <Route path='/home' element={<Home />} />
             <Route path='/attendence' element={<Attendence />} />
-            {/* <Route path='/my-attendence' element={<MyAttHistory />} /> */}
+            <Route path='/my-attendence' element={<MyAttHistory />} />
             {/* Default Route  */}
-            {/* <Route path='*' element={<Navigate to="/home" />} /> */}
-            <Route path='*' element={<Navigate to="/attendence" />} />
+            <Route path='*' element={<Navigate to="/home" />} />
+            {/* <Route path='*' element={<Navigate to="/attendence" />} /> */}
         </Routes>
     </div>
   )

@@ -62,3 +62,14 @@ export const makeAnnouncement = async (body) => {
 
     return await fetchApi(route, options)
 }
+
+export const getAnnouncements = async () => {
+    const route =  '/api/admin/get-announcements'
+    const options = {
+        method: "GET",
+        headers : {
+            authorization : `token ${localStorage.getItem('token')}`
+        }
+    }
+    return await fetchApi(route, options)
+}

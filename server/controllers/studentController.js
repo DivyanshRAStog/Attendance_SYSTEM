@@ -3,6 +3,7 @@ const catchErrors = require("../utils/catchErrors");
 const User = require('../models/User')
 const { successResponse, errorResponse } = require("../utils/response");
 const { isCodeValid, isAttendenceMarked, getDateString } = require("../utils/AttendenceUtils");
+const Announcement = require("../models/Announcement");
 
 
 exports.getFaceRecognitionLabels = catchErrors(async (req, res) => {
@@ -50,5 +51,16 @@ exports.getMyAttendence = catchErrors(async (req, res) => {
         .sort({createdAt : 'desc'})
 
     res.status(200).json(successResponse('success', attHistory))
+})
+
+
+exports.getAnnouncements = catchErrors(async (req, res) => {
+    const announcmnts = await Announcement.find({
+        batch: req.user.batch, 
+        branch: req.user.branch
+    })
+    .populate('announcer', 'name')
+    .sort({createdAt : 'desc'})
+    res.status(200).json(successResponse('success', announcmnts))
 })
 
